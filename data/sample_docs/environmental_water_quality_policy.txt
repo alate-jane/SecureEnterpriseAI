@@ -1,0 +1,11 @@
+TASMANIAN ENVIRONMENTAL PROTECTION AND RIPARIAN CATCHMENT POLICY
+Classification: Public
+
+1. OVERVIEW
+This policy dictates baseline water quality monitoring standards across river catchments and agricultural runoff zones throughout southern and northern Tasmania.
+
+2. TURBIDITY AND SEDIMENTATION THRESHOLDS
+Stormwater discharges into Class A aquatic reserves must not exceed 25 NTU (Nephelometric Turbidity Units). Real-time telemetry sensors deployed at designated culverts must report daily median turbidity values to the public environmental monitoring register.
+
+3. REMEDIATION AND STAKEHOLDER CONSULTATION
+If dissolved oxygen levels fall below 6.5 mg/L or heavy metal traces are detected above ANZG (2018) trigger levels, operations must cease and local community stakeholders must be notified within 24 hours.

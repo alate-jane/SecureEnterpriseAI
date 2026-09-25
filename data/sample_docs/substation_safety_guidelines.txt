@@ -1,0 +1,12 @@
+REGIONAL POWER & UTILITIES INFRASTRUCTURE
+SUBSTATION MAINTENANCE AND HIGH VOLTAGE SAFETY DIRECTIVE (STANDARD HV-401)
+Classification: Internal
+
+1. SCOPE AND MANDATORY PRE-ENTRY REQUIREMENTS
+All personnel accessing high-voltage substation zones (including 110kV and 220kV yards) must possess current Level 3 Electrical Safety Induction certification. Work party leaders must conduct an on-site safety briefing and record ambient weather conditions before issuing any Permit to Work (PTW).
+
+2. ARC FLASH PROTECTION AND PPE PROTOCOLS
+Switching operations and visual busbar inspections require Minimum Category 4 Arc Flash apparel (minimum rating 40 cal/cm2), full-face shield, and dielectric footwear compliant with AS/NZS 4836. Conductive objects, personal jewellery, and mobile telecommunications equipment must be secured outside the designated exclusion boundary.
+
+3. EMERGENCY ISOLATION AND INCIDENT REPORTING
+In the event of an unintended trip, arc flash incident, or equipment telemetry fault, operators must immediately depress the station emergency trip push-button, evacuate to the designated muster point, and contact the Central Network Operations Centre (NOC) within 15 minutes. No re-energisation attempt may occur without written approval from the Senior Electrical Asset Controller.
