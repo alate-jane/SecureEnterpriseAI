@@ -176,6 +176,10 @@
       document.getElementById('answerText').innerText = "Processing query through security & RAG pipeline...";
       document.getElementById('citationsList').innerHTML = "";
 
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Processing...";
+
       try {
         const res = await fetch('/api/query', {
           method: 'POST',
@@ -188,7 +192,10 @@
         if (!res.ok) {
           document.getElementById('resInjection').innerText = "FLAGGED / BLOCKED";
           document.getElementById('resInjection').className = "font-bold text-rose-400";
-          document.getElementById('answerText').innerText = `[BLOCKED BY SECURITY GATE]\n${data.detail?.reason || data.detail}`;
+          const errDetail = typeof data.detail === 'object' 
+            ? (data.detail.reason || JSON.stringify(data.detail, null, 2)) 
+            : data.detail;
+          document.getElementById('answerText').innerText = `[BLOCKED BY SECURITY GATE]\n${errDetail}`;
           document.getElementById('resFaithful').innerText = "N/A";
           document.getElementById('resLatency').innerText = "0ms";
           document.getElementById('resPii').innerText = "0 Items";
@@ -230,6 +237,9 @@
 
       } catch (err) {
         document.getElementById('answerText').innerText = "Error: " + err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Query";
       }
     });
 

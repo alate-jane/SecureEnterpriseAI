@@ -168,11 +168,47 @@ class RAGEngine:
                 temperature=0.0
             )
             answer_text = response.choices[0].message.content
+        elif settings.llm_provider in ("gemini", "google") or settings.gemini_api_key:
+            import urllib.request
+            import json
+            model_name = settings.gemini_model or "gemini-flash-latest"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.gemini_api_key}"
+            payload = {
+                "system_instruction": {
+                    "parts": [{"text": system_prompt}]
+                },
+                "contents": [
+                    {
+                        "parts": [{"text": f"Context:\n{context_str}\n\nQuestion: {query}"}]
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.1
+                }
+            }
+            try:
+                req_data = json.dumps(payload).encode("utf-8")
+                req = urllib.request.Request(
+                    url,
+                    data=req_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    answer_text = data["candidates"][0]["content"]["parts"][0]["text"]
+            except urllib.error.HTTPError as he:
+                err_body = he.read().decode("utf-8", errors="ignore")
+                answer_text = f"Gemini API Error ({he.code}): {err_body}"
+            except Exception as e:
+                answer_text = f"Gemini Request Failed: {str(e)}"
         else:
             # Deterministic mock generation for zero-cost offline demonstration
+            formatted_chunks = "\n\n".join([
+                f"• From {c['metadata']['source']} (Page {c['metadata'].get('page', 1)}):\n{c['content'].strip()}"
+                for c in context_chunks
+            ])
             answer_text = (
-                f"Based on verified enterprise documentation ({citations[0]['source']}):\n"
-                f"{context_chunks[0]['content'][:250]}..."
+                f"Based on verified enterprise documentation:\n\n{formatted_chunks}"
             )
 
         return {
