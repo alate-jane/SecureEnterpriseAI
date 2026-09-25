@@ -10,8 +10,10 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
   <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      
+      <!-- Brand -->
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30">
           <i class="fa-solid fa-shield-halved"></i>
@@ -22,65 +24,58 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-4">
-        <!-- RBAC Role Selector -->
-        <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
-          <span class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-user-lock mr-1 text-indigo-400"></i> Active Role:</span>
-          <select id="userRole" class="bg-slate-900 text-xs text-indigo-300 font-semibold rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-indigo-500">
-            <option value="guest">Guest (Public only)</option>
-            <option value="employee" selected>Employee (Public + Internal)</option>
-            <option value="executive">Executive (All Access)</option>
-            <option value="compliance_officer">Compliance Officer (Full Audit)</option>
-          </select>
+      <!-- Right Header Actions & User Profile -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- Run Security Benchmark Button -->
+        <button onclick="runBenchmark()" class="hidden md:flex bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg font-medium transition items-center space-x-1.5">
+          <i class="fa-solid fa-bolt text-indigo-400"></i>
+          <span>Security Evals</span>
+        </button>
+
+        <!-- Admin Only Button (Hidden for non-admins) -->
+        <button id="adminManageBtn" onclick="openAdminModal()" class="hidden bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/60 text-indigo-200 text-xs px-3 py-2 rounded-lg font-semibold transition items-center space-x-1.5 shadow-sm shadow-indigo-500/20">
+          <i class="fa-solid fa-folder-gear text-indigo-300"></i>
+          <span>Manage Documents (Admin)</span>
+        </button>
+
+        <!-- User Profile & Auth Trigger -->
+        <div id="userProfileArea" class="flex items-center space-x-3 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+          <!-- Populated by JavaScript -->
         </div>
 
-        <button onclick="runBenchmark()" class="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs px-3 py-2 rounded-lg font-medium transition flex items-center space-x-1.5">
-          <i class="fa-solid fa-bolt"></i>
-          <span>Run Security Benchmark</span>
-        </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Query & Demo Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
     
-    <!-- Left Column: Document Ingestion & Quick Prompts -->
+    <!-- Left Column: Quick Scenarios & Role Info -->
     <div class="space-y-6">
       
-      <!-- Ingestion Card -->
+      <!-- Current Clearance Card -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
-        <h2 class="text-sm font-semibold text-slate-200 mb-3 flex items-center">
-          <i class="fa-solid fa-file-arrow-up mr-2 text-indigo-400"></i> Index Enterprise Document
+        <h2 class="text-xs uppercase tracking-wider font-semibold text-slate-400 mb-2 flex items-center">
+          <i class="fa-solid fa-id-badge mr-2 text-indigo-400"></i> Active Access Clearance
         </h2>
-        <form id="uploadForm" class="space-y-4">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Select File (PDF, TXT, MD)</label>
-            <input type="file" id="docFile" required class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-          </div>
-
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Classification Level</label>
-            <select id="docClassification" class="w-full bg-slate-950 text-xs text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none">
-              <option value="public">Public</option>
-              <option value="internal" selected>Internal</option>
-              <option value="confidential">Confidential</option>
-            </select>
-          </div>
-
-          <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium py-2 px-4 rounded-lg transition border border-slate-700">
-            Ingest & Embed Vector
-          </button>
-        </form>
-        <div id="uploadStatus" class="mt-3 text-xs hidden"></div>
+        <div id="clearanceSummary" class="text-xs text-slate-300 space-y-1">
+          <!-- Populated by JS -->
+        </div>
       </div>
 
       <!-- Quick Test Queries -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Sample Scenarios</h3>
+        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Pre-Configured Test Queries</h3>
         <div class="space-y-2">
           <button onclick="setQuery('What are the standard safety inspection procedures for substation maintenance?')" class="w-full text-left text-xs bg-slate-950/60 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-800/80 transition">
-            🛡️ <span class="font-medium text-slate-200">Engineering Inquiry</span>
+            🛡️ <span class="font-medium text-slate-200">Engineering Safety Query</span>
+          </button>
+          <button onclick="setQuery('What is the water quality turbidity threshold in Class A aquatic reserves?')" class="w-full text-left text-xs bg-slate-950/60 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-800/80 transition">
+            💧 <span class="font-medium text-slate-200">Environmental Policy Query (Public)</span>
+          </button>
+          <button onclick="setQuery('What is the budget in the confidential financial report?')" class="w-full text-left text-xs bg-slate-950/60 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-800/80 transition">
+            💼 <span class="font-medium text-emerald-300">Confidential Budget Query (Exec/Admin only)</span>
           </button>
           <button onclick="setQuery('Contact Alex at 0412345678 regarding confidential financial report.')" class="w-full text-left text-xs bg-slate-950/60 hover:bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-800/80 transition">
             🔍 <span class="font-medium text-amber-300">Test PII Redaction</span> (Phone & Email)
@@ -93,20 +88,23 @@
 
     </div>
 
-    <!-- Center/Right Column: Query Terminal & Results -->
+    <!-- Center/Right Column: Query Interface & Answers -->
     <div class="lg:col-span-2 space-y-6">
       
       <!-- Query Box -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <form id="queryForm" class="space-y-3">
-          <label class="block text-xs font-semibold text-slate-300">Ask Enterprise Knowledge Base</label>
+          <div class="flex justify-between items-center">
+            <label class="block text-xs font-semibold text-slate-300">Ask Enterprise Knowledge Base</label>
+            <span id="roleIndicator" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">Role: Guest</span>
+          </div>
           <div class="relative">
-            <textarea id="queryInput" rows="3" required placeholder="Type query or test adversarial input..." class="w-full bg-slate-950 text-slate-200 text-sm rounded-lg p-3 border border-slate-700 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
+            <textarea id="queryInput" rows="3" required placeholder="Type enquiry or test adversarial security input..." class="w-full bg-slate-950 text-slate-200 text-sm rounded-lg p-3 border border-slate-700 focus:outline-none focus:border-indigo-500 font-mono"></textarea>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-xs text-slate-500 font-mono">Protected by SecurityEngine + RBAC</span>
-            <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-5 rounded-lg transition shadow-md shadow-indigo-600/30">
-              Submit Query
+            <span class="text-xs text-slate-500 font-mono">Protected by SecurityEngine + Vector RBAC</span>
+            <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-5 rounded-lg transition shadow-md shadow-indigo-600/30 flex items-center space-x-1.5">
+              <span>Submit Query</span>
             </button>
           </div>
         </form>
@@ -161,7 +159,457 @@
 
   </main>
 
+  <!-- ==================== SIGN IN MODAL ==================== -->
+  <div id="loginModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+      
+      <!-- Close button -->
+      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div>
+        <div class="w-10 h-10 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-400 flex items-center justify-center font-bold text-lg mb-2">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h2 class="text-base font-bold text-white">Enterprise Staff Sign In</h2>
+        <p class="text-xs text-slate-400">Sign in to unlock Internal, Confidential, or Admin capabilities.</p>
+      </div>
+
+      <!-- Quick Demo Account Fillers -->
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-2">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Quick Demo Roles (1-Click)</span>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="quickFill('emp_jane', 'emp123')" class="bg-slate-900 hover:bg-slate-800 text-[11px] py-1.5 px-2 rounded-lg border border-slate-700 text-slate-200 text-center font-medium">
+            💼 Employee
+          </button>
+          <button type="button" onclick="quickFill('exec_sarah', 'exec123')" class="bg-slate-900 hover:bg-slate-800 text-[11px] py-1.5 px-2 rounded-lg border border-slate-700 text-slate-200 text-center font-medium">
+            👔 Executive
+          </button>
+          <button type="button" onclick="quickFill('admin_boss', 'admin123')" class="bg-indigo-950/60 hover:bg-indigo-900/60 text-[11px] py-1.5 px-2 rounded-lg border border-indigo-700 text-indigo-200 text-center font-bold">
+            🛡️ Admin
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Username</label>
+          <input type="text" id="loginUsername" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Password</label>
+          <input type="password" id="loginPassword" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono">
+        </div>
+        
+        <div id="loginError" class="text-xs text-rose-400 hidden"></div>
+
+        <button type="submit" id="loginSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2.5 rounded-lg transition shadow-md shadow-indigo-600/30">
+          Sign In
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN DOCUMENT MANAGER MODAL ==================== -->
+  <div id="adminModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Close button -->
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-lg font-bold">
+          <i class="fa-solid fa-folder-gear"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white">Admin Console: Knowledge Base Manager</h2>
+          <p class="text-xs text-slate-400">View, upload, or delete enterprise documents from ChromaDB vector store.</p>
+        </div>
+      </div>
+
+      <!-- Upload New Document Section -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center">
+          <i class="fa-solid fa-file-arrow-up mr-2 text-indigo-400"></i> Ingest New Enterprise Document
+        </h3>
+        <form id="adminUploadForm" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Select File (PDF, TXT, MD)</label>
+            <input type="file" id="adminDocFile" required class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Clearance Classification</label>
+            <select id="adminDocClassification" class="w-full bg-slate-900 text-xs text-slate-200 rounded-lg px-3 py-2 border border-slate-700 focus:outline-none">
+              <option value="public">Public (Everyone)</option>
+              <option value="internal" selected>Internal (Staff only)</option>
+              <option value="confidential">Confidential (Executive/Admin)</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" id="adminUploadBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition shadow-md">
+              Upload & Vectorize
+            </button>
+          </div>
+        </form>
+        <div id="adminUploadStatus" class="text-xs hidden mt-2"></div>
+      </div>
+
+      <!-- Document Inventory Table -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            Indexed Documents (<span id="adminDocCount">0</span> Files, <span id="adminVectorCount">0</span> Total Vectors)
+          </h3>
+          <button onclick="loadAdminDocuments()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh List
+          </button>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Document Source</th>
+                <th class="py-3 px-4">Classification</th>
+                <th class="py-3 px-4">Pages</th>
+                <th class="py-3 px-4">Vector Chunks</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminDocTableBody" class="divide-y divide-slate-800">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dangerous Zone (Reset DB) -->
+      <div class="border-t border-slate-800 pt-4 flex justify-between items-center text-xs">
+        <div>
+          <span class="text-slate-400 font-medium">Factory Reset Knowledge Base:</span>
+          <span class="text-slate-500 text-[11px] block">Permanently purges all vector embeddings from ChromaDB.</span>
+        </div>
+        <button onclick="factoryResetDatabase()" class="bg-rose-900/30 hover:bg-rose-900/50 border border-rose-700/60 text-rose-300 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Wipe All Vectors
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <script>
+    // State
+    let currentUser = {
+      username: "guest",
+      display_name: "Guest Visitor",
+      role: "guest",
+      is_authenticated: false
+    };
+
+    // Helper: Auth headers
+    function getAuthHeaders() {
+      const token = sessionStorage.getItem('auth_token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
+    // Initialize User State
+    async function initUser() {
+      const token = sessionStorage.getItem('auth_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
+          if (res.ok) {
+            currentUser = await res.json();
+          } else {
+            sessionStorage.removeItem('auth_token');
+          }
+        } catch (e) {
+          console.error("Auth check failed:", e);
+        }
+      }
+      renderHeaderAndClearance();
+    }
+
+    function renderHeaderAndClearance() {
+      const userProfileArea = document.getElementById('userProfileArea');
+      const adminManageBtn = document.getElementById('adminManageBtn');
+      const clearanceSummary = document.getElementById('clearanceSummary');
+      const roleIndicator = document.getElementById('roleIndicator');
+
+      // Update role badge and clearance info
+      roleIndicator.innerText = `Role: ${currentUser.role.toUpperCase()}`;
+
+      if (currentUser.role === 'admin') {
+        adminManageBtn.classList.remove('hidden');
+        adminManageBtn.classList.add('flex');
+      } else {
+        adminManageBtn.classList.add('hidden');
+        adminManageBtn.classList.remove('flex');
+      }
+
+      if (currentUser.is_authenticated) {
+        // Authenticated user UI
+        let roleBadgeColor = "bg-slate-800 text-slate-300";
+        if (currentUser.role === 'admin') roleBadgeColor = "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40";
+        else if (currentUser.role === 'executive') roleBadgeColor = "bg-emerald-600/30 text-emerald-300 border border-emerald-500/40";
+        else if (currentUser.role === 'employee') roleBadgeColor = "bg-amber-600/30 text-amber-300 border border-amber-500/40";
+
+        userProfileArea.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-300">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="text-left">
+              <div class="text-xs font-semibold text-white leading-tight">${currentUser.display_name}</div>
+              <div class="text-[10px] text-slate-400 capitalize">${currentUser.role}</div>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded font-mono uppercase ${roleBadgeColor}">
+            ${currentUser.role}
+          </span>
+          <button onclick="signOut()" class="text-xs text-rose-400 hover:text-rose-300 ml-2 font-medium" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        `;
+      } else {
+        // Guest mode UI
+        userProfileArea.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-user text-slate-500 mr-1"></i> Guest Mode</span>
+          </div>
+          <button onclick="openLoginModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm">
+            <i class="fa-solid fa-lock mr-1 text-[10px]"></i> Sign In
+          </button>
+        `;
+      }
+
+      // Clearance info panel
+      let allowedText = "Public documents only";
+      if (currentUser.role === 'employee') allowedText = "Public & Internal enterprise documents";
+      else if (currentUser.role === 'executive' || currentUser.role === 'admin') allowedText = "Public, Internal, and Confidential strategic documents";
+
+      clearanceSummary.innerHTML = `
+        <div><span class="text-slate-400">User:</span> <b class="text-white">${currentUser.display_name}</b></div>
+        <div><span class="text-slate-400">Clearance:</span> <b class="text-emerald-400">${allowedText}</b></div>
+        <div><span class="text-slate-400">Document Management:</span> <b class="${currentUser.role === 'admin' ? 'text-indigo-400' : 'text-slate-500'}">${currentUser.role === 'admin' ? 'Authorized (Full Admin)' : 'Restricted (Admin only)'}</b></div>
+      `;
+    }
+
+    function signOut() {
+      sessionStorage.removeItem('auth_token');
+      currentUser = {
+        username: "guest",
+        display_name: "Guest Visitor",
+        role: "guest",
+        is_authenticated: false
+      };
+      renderHeaderAndClearance();
+      closeAdminModal();
+    }
+
+    // Modal Handlers
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('loginError').classList.add('hidden');
+    }
+    function quickFill(user, pass) {
+      document.getElementById('loginUsername').value = user;
+      document.getElementById('loginPassword').value = pass;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value;
+      const p = document.getElementById('loginPassword').value;
+      const err = document.getElementById('loginError');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          err.innerText = data.detail || "Authentication failed.";
+          err.classList.remove('hidden');
+          return;
+        }
+
+        sessionStorage.setItem('auth_token', data.token);
+        currentUser = {
+          username: data.username,
+          display_name: data.display_name,
+          role: data.role,
+          is_authenticated: true
+        };
+        closeLoginModal();
+        renderHeaderAndClearance();
+
+        // If admin, open admin modal immediately
+        if (currentUser.role === 'admin') {
+          openAdminModal();
+        }
+      } catch (e) {
+        err.innerText = "Error: " + e.message;
+        err.classList.remove('hidden');
+      }
+    });
+
+    // Admin Document Manager
+    function openAdminModal() {
+      if (currentUser.role !== 'admin') {
+        alert("Access Denied: Only Admin can access Document Management.");
+        return;
+      }
+      document.getElementById('adminModal').classList.remove('hidden');
+      loadAdminDocuments();
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    async function loadAdminDocuments() {
+      try {
+        const res = await fetch('/api/admin/documents', { headers: getAuthHeaders() });
+        if (!res.ok) {
+          alert("Failed to load documents: " + res.statusText);
+          return;
+        }
+        const data = await res.json();
+        document.getElementById('adminDocCount').innerText = data.documents.length;
+        document.getElementById('adminVectorCount').innerText = data.total_vectors;
+
+        const tbody = document.getElementById('adminDocTableBody');
+        tbody.innerHTML = "";
+
+        if (data.documents.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 italic">No documents currently indexed in ChromaDB.</td></tr>`;
+          return;
+        }
+
+        data.documents.forEach(doc => {
+          let badgeColor = "bg-slate-800 text-slate-300";
+          if (doc.classification === 'public') badgeColor = "bg-emerald-950 text-emerald-400 border border-emerald-800";
+          else if (doc.classification === 'internal') badgeColor = "bg-amber-950 text-amber-400 border border-amber-800";
+          else if (doc.classification === 'confidential') badgeColor = "bg-rose-950 text-rose-400 border border-rose-800";
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-950/40 transition";
+          row.innerHTML = `
+            <td class="py-3 px-4 font-medium text-slate-200 flex items-center space-x-2">
+              <i class="fa-solid fa-file-lines text-indigo-400"></i>
+              <span>${doc.filename}</span>
+            </td>
+            <td class="py-3 px-4">
+              <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded ${badgeColor}">
+                ${doc.classification}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-slate-400">${doc.total_pages} page(s)</td>
+            <td class="py-3 px-4 text-slate-300 font-mono">${doc.total_chunks} chunks</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="deleteDocument('${doc.filename}')" class="bg-rose-900/30 hover:bg-rose-900/60 text-rose-300 px-2.5 py-1 rounded text-xs transition border border-rose-800/60" title="Delete from Vector DB">
+                <i class="fa-solid fa-trash-can mr-1"></i> Delete
+              </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (e) {
+        console.error("Load documents error:", e);
+      }
+    }
+
+    async function deleteDocument(filename) {
+      if (!confirm(`Are you sure you want to delete '${filename}' from ChromaDB?`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/documents/${encodeURIComponent(filename)}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(`Successfully removed '${filename}' (${data.deleted_chunks} vector chunks purged).`);
+          loadAdminDocuments();
+        } else {
+          alert("Error: " + (data.detail || "Delete failed"));
+        }
+      } catch (e) {
+        alert("Network error: " + e.message);
+      }
+    }
+
+    async function factoryResetDatabase() {
+      if (!confirm("⚠️ WARNING: This will permanently delete ALL documents from ChromaDB!\n\nProceed?")) return;
+
+      try {
+        const res = await fetch('/api/admin/reset', {
+          method: 'POST',
+          headers: getAuthHeaders()
+        });
+        if (res.ok) {
+          alert("Vector database successfully wiped clean.");
+          loadAdminDocuments();
+        } else {
+          alert("Reset failed.");
+        }
+      } catch (e) {
+        alert("Network error: " + e.message);
+      }
+    }
+
+    // Admin Upload Handler
+    document.getElementById('adminUploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('adminDocFile');
+      const classification = document.getElementById('adminDocClassification').value;
+      const statusDiv = document.getElementById('adminUploadStatus');
+
+      if (!fileInput.files[0]) return;
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('classification', classification);
+
+      statusDiv.classList.remove('hidden');
+      statusDiv.innerHTML = "<span class='text-indigo-400'>Parsing document and embedding vectors...</span>";
+
+      try {
+        const token = sessionStorage.getItem('auth_token');
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          statusDiv.innerHTML = `<span class='text-emerald-400'>✓ Ingested <b>${data.filename}</b> (${data.chunks_indexed} chunks indexed).</span>`;
+          fileInput.value = '';
+          loadAdminDocuments();
+        } else {
+          statusDiv.innerHTML = `<span class='text-rose-400'>Upload failed: ${data.detail || res.statusText}</span>`;
+        }
+      } catch (err) {
+        statusDiv.innerHTML = `<span class='text-rose-400'>Upload failed: ${err.message}</span>`;
+      }
+    });
+
+    // Query Submission
     function setQuery(text) {
       document.getElementById('queryInput').value = text;
     }
@@ -169,11 +617,10 @@
     document.getElementById('queryForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const query = document.getElementById('queryInput').value;
-      const role = document.getElementById('userRole').value;
       const resultCard = document.getElementById('resultCard');
 
       resultCard.classList.remove('hidden');
-      document.getElementById('answerText').innerText = "Processing query through security & RAG pipeline...";
+      document.getElementById('answerText').innerText = "Processing enquiry through security & RAG pipeline...";
       document.getElementById('citationsList').innerHTML = "";
 
       const submitBtn = document.getElementById('submitBtn');
@@ -183,8 +630,8 @@
       try {
         const res = await fetch('/api/query', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: query, user_role: role })
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ query: query, user_role: currentUser.role })
         });
 
         const data = await res.json();
@@ -218,6 +665,11 @@
           list.innerHTML = "<p class='text-xs text-slate-500 italic'>No citations retrieved within this clearance level.</p>";
         } else {
           data.citations.forEach(c => {
+            let badgeColor = "bg-slate-800 text-slate-300";
+            if (c.classification === 'public') badgeColor = "bg-emerald-950 text-emerald-400 border border-emerald-800";
+            else if (c.classification === 'internal') badgeColor = "bg-amber-950 text-amber-400 border border-amber-800";
+            else if (c.classification === 'confidential') badgeColor = "bg-rose-950 text-rose-400 border border-rose-800";
+
             const item = document.createElement('div');
             item.className = "flex items-center justify-between text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800";
             item.innerHTML = `
@@ -227,7 +679,7 @@
                 <span class="text-slate-500 text-[10px]">(Page ${c.page})</span>
               </div>
               <div class="flex items-center space-x-2">
-                <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-800 text-slate-300">${c.classification}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold ${badgeColor}">${c.classification}</span>
                 <span class="text-indigo-400 font-mono text-[11px]">${Math.round(c.relevance_score * 100)}% match</span>
               </div>
             `;
@@ -243,44 +695,19 @@
       }
     });
 
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('docFile');
-      const classification = document.getElementById('docClassification').value;
-      const statusDiv = document.getElementById('uploadStatus');
-
-      if (!fileInput.files[0]) return;
-
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-      formData.append('classification', classification);
-
-      statusDiv.classList.remove('hidden');
-      statusDiv.innerHTML = "<span class='text-indigo-400'>Uploading and generating vector embeddings...</span>";
-
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        statusDiv.innerHTML = `<span class='text-emerald-400'>✓ Ingested <b>${data.filename}</b> (${data.chunks_indexed} chunks indexed).</span>`;
-        fileInput.value = '';
-      } catch (err) {
-        statusDiv.innerHTML = `<span class='text-rose-400'>Upload failed: ${err.message}</span>`;
-      }
-    });
-
     async function runBenchmark() {
       const card = document.getElementById('benchmarkCard');
       const output = document.getElementById('benchmarkOutput');
       card.classList.remove('hidden');
-      output.innerText = "Running automated security injection & PII scrub benchmark suite...";
+      output.innerText = "Running automated security defense & PII scrub benchmark suite...";
 
       const res = await fetch('/api/benchmark');
       const data = await res.json();
       output.innerText = JSON.stringify(data, null, 2);
     }
+
+    // Start on page load
+    initUser();
   </script>
 </body>
 </html>

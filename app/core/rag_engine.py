@@ -79,6 +79,54 @@ class RAGEngine:
             )
         return len(chunks)
 
+    def list_indexed_documents(self) -> List[Dict]:
+        """Aggregates all unique documents stored in ChromaDB with metadata summary."""
+        count = self.collection.count()
+        if count == 0:
+            return []
+
+        all_data = self.collection.get(include=["metadatas"])
+        metadatas = all_data.get("metadatas", [])
+
+        docs_summary: Dict[str, dict] = {}
+        for m in metadatas:
+            src = m.get("source", "unknown")
+            if src not in docs_summary:
+                docs_summary[src] = {
+                    "filename": src,
+                    "classification": m.get("classification", "unknown"),
+                    "total_chunks": 0,
+                    "pages": set()
+                }
+            docs_summary[src]["total_chunks"] += 1
+            if "page" in m:
+                docs_summary[src]["pages"].add(m["page"])
+
+        result = []
+        for src, info in docs_summary.items():
+            result.append({
+                "filename": info["filename"],
+                "classification": info["classification"],
+                "total_chunks": info["total_chunks"],
+                "total_pages": len(info["pages"]) if info["pages"] else 1
+            })
+        return result
+
+    def delete_document(self, filename: str) -> int:
+        """Deletes all chunks belonging to a specific document."""
+        count_before = self.collection.count()
+        self.collection.delete(where={"source": filename})
+        count_after = self.collection.count()
+        return count_before - count_after
+
+    def reset_knowledge_base(self):
+        """Purges and reinitializes the collection."""
+        self.chroma_client.delete_collection("enterprise_knowledge")
+        self.collection = self.chroma_client.get_or_create_collection(
+            name="enterprise_knowledge",
+            metadata={"hnsw:space": "cosine"}
+        )
+
     def retrieve(self, query: str, rbac_filter: dict, top_k: int = 3) -> List[Dict]:
         """Queries the vector database applying RBAC clearance filters."""
         count = self.collection.count()

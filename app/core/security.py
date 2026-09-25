@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 # Role hierarchy: higher roles inherit access to lower classification levels
 ROLE_PERMISSIONS: Dict[str, List[str]] = {
@@ -7,7 +7,75 @@ ROLE_PERMISSIONS: Dict[str, List[str]] = {
     "employee": ["public", "internal"],
     "executive": ["public", "internal", "confidential"],
     "compliance_officer": ["public", "internal", "confidential"],
+    "admin": ["public", "internal", "confidential"],
 }
+
+# Pre-seeded enterprise demo users
+USERS_DB: Dict[str, dict] = {
+    "guest_user": {
+        "username": "guest_user",
+        "display_name": "Guest Visitor",
+        "password": "guest123",
+        "role": "guest"
+    },
+    "emp_jane": {
+        "username": "emp_jane",
+        "display_name": "Jane Developer",
+        "password": "emp123",
+        "role": "employee"
+    },
+    "exec_sarah": {
+        "username": "exec_sarah",
+        "display_name": "Sarah Executive",
+        "password": "exec123",
+        "role": "executive"
+    },
+    "admin_boss": {
+        "username": "admin_boss",
+        "display_name": "System Administrator",
+        "password": "admin123",
+        "role": "admin"
+    }
+}
+
+import hmac
+import hashlib
+import json
+import base64
+import time
+
+SECRET_KEY = "enterprise-secure-ai-secret-key-2026"
+
+def create_access_token(username: str, role: str) -> str:
+    """Generates a signed URL-safe bearer token."""
+    payload = {
+        "sub": username,
+        "role": role,
+        "exp": int(time.time()) + 86400  # 24 hours
+    }
+    encoded_payload = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+    signature = hmac.new(SECRET_KEY.encode(), encoded_payload.encode(), hashlib.sha256).hexdigest()
+    return f"{encoded_payload}.{signature}"
+
+def verify_access_token(token: str) -> Optional[dict]:
+    """Validates signature and expiration of bearer token."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 2:
+            return None
+        encoded_payload, sig = parts
+        expected_sig = hmac.new(SECRET_KEY.encode(), encoded_payload.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+        padding = 4 - (len(encoded_payload) % 4)
+        if padding != 4:
+            encoded_payload += "=" * padding
+        payload = json.loads(base64.urlsafe_b64decode(encoded_payload.encode()).decode())
+        if payload.get("exp", 0) < time.time():
+            return None
+        return payload
+    except Exception:
+        return None
 
 # Known prompt injection signatures & jailbreak patterns
 PROMPT_INJECTION_PATTERNS = [
